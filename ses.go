@@ -42,11 +42,17 @@ var EnvConfig = Config{
 
 // SendEmail sends a plain text email. Note that from must be a verified
 // address in the AWS control panel.
-func (c *Config) SendEmail(from, to, subject, body string) (string, error) {
+func (c *Config) SendEmail(from, to, cc, bcc, subject, body string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
 	data.Add("Source", from)
 	data.Add("Destination.ToAddresses.member.1", to)
+	if cc != "" {
+		data.Add("Destination.CcAddresses.member.1", cc)
+	}
+	if bcc != "" {
+		data.Add("Destination.BccAddresses.member.1", bcc)
+	}
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", body)
 	data.Add("AWSAccessKeyId", c.AccessKeyID)
@@ -56,11 +62,17 @@ func (c *Config) SendEmail(from, to, subject, body string) (string, error) {
 
 // SendEmailHTML sends a HTML email. Note that from must be a verified address
 // in the AWS control panel.
-func (c *Config) SendEmailHTML(from, to, subject, bodyText, bodyHTML string) (string, error) {
+func (c *Config) SendEmailHTML(from, to, cc, bcc, subject, bodyText, bodyHTML string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
 	data.Add("Source", from)
 	data.Add("Destination.ToAddresses.member.1", to)
+	if cc != "" {
+		data.Add("Destination.CcAddresses.member.1", cc)
+	}
+	if bcc != "" {
+		data.Add("Destination.BccAddresses.member.1", bcc)
+	}
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", bodyText)
 	data.Add("Message.Body.Html.Data", bodyHTML)
