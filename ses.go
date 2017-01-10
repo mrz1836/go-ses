@@ -42,17 +42,27 @@ var EnvConfig = Config{
 
 // SendEmail sends a plain text email. Note that from must be a verified
 // address in the AWS control panel.
-func (c *Config) SendEmail(from, to, cc, bcc, subject, body string) (string, error) {
+func (c *Config) SendEmail(from string, to, cc, bcc []string, subject, body string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
 	data.Add("Source", from)
-	data.Add("Destination.ToAddresses.member.1", to)
-	if cc != "" {
-		data.Add("Destination.CcAddresses.member.1", cc)
+
+	if to != nil {
+		for i := 0; i < len(to); i++ {
+			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", (i+1)), to[i])
+		}
 	}
-	if bcc != "" {
-		data.Add("Destination.BccAddresses.member.1", bcc)
+	if cc != nil {
+		for i := 0; i < len(cc); i++ {
+			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", (i+1)), cc[i])
+		}
 	}
+	if bcc != nil {
+		for i := 0; i < len(bcc); i++ {
+			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", (i+1)), bcc[i])
+		}
+	}
+
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", body)
 	data.Add("AWSAccessKeyId", c.AccessKeyID)
@@ -62,17 +72,27 @@ func (c *Config) SendEmail(from, to, cc, bcc, subject, body string) (string, err
 
 // SendEmailHTML sends a HTML email. Note that from must be a verified address
 // in the AWS control panel.
-func (c *Config) SendEmailHTML(from, to, cc, bcc, subject, bodyText, bodyHTML string) (string, error) {
+func (c *Config) SendEmailHTML(from string, to, cc, bcc []string, subject, bodyText, bodyHTML string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
 	data.Add("Source", from)
-	data.Add("Destination.ToAddresses.member.1", to)
-	if cc != "" {
-		data.Add("Destination.CcAddresses.member.1", cc)
+
+	if to != nil {
+		for i := 0; i < len(to); i++ {
+			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", (i+1)), to[i])
+		}
 	}
-	if bcc != "" {
-		data.Add("Destination.BccAddresses.member.1", bcc)
+	if cc != nil {
+		for i := 0; i < len(cc); i++ {
+			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", (i+1)), cc[i])
+		}
 	}
+	if bcc != nil {
+		for i := 0; i < len(bcc); i++ {
+			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", (i+1)), bcc[i])
+		}
+	}
+
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", bodyText)
 	data.Add("Message.Body.Html.Data", bodyHTML)
