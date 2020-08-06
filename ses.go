@@ -4,10 +4,8 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -120,9 +118,7 @@ func sesGet(data url.Values, endpoint, accessKeyID, secretAccessKey string) (str
 	endpointURL, _ := url.Parse(urlString)
 	headers := map[string][]string{}
 
-	now := time.Now().UTC()
-	// date format: "Tue, 25 May 2010 21:20:27 +0000"
-	date := now.Format("Mon, 02 Jan 2006 15:04:05 -0700")
+	date := time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 -0700")
 	headers["Date"] = []string{date}
 
 	h := hmac.New(sha256.New, []uint8(secretAccessKey))
@@ -132,44 +128,39 @@ func sesGet(data url.Values, endpoint, accessKeyID, secretAccessKey string) (str
 	headers["X-Amzn-Authorization"] = []string{auth}
 
 	req := http.Request{
-		URL:        endpointURL,
+		Close:      true,
+		Header:     headers,
 		Method:     "GET",
 		ProtoMajor: 1,
 		ProtoMinor: 1,
-		Close:      true,
-		Header:     headers,
+		URL:        endpointURL,
 	}
 
 	r, err := http.DefaultClient.Do(&req)
 	if err != nil {
-		log.Printf("http error: %s", err)
 		return "", err
 	}
 
 	resultBody, _ := ioutil.ReadAll(r.Body)
-	_ = r.Body.Close()
+	defer func() {
+		_ = r.Body.Close()
+	}()
 
 	if r.StatusCode != http.StatusOK {
-		log.Printf("error, status = %d", r.StatusCode)
-
-		log.Printf("error response: %s", resultBody)
-		return "", errors.New(string(resultBody))
+		return "", fmt.Errorf("error code %d. response: %s", r.StatusCode, resultBody)
 	}
 
 	return string(resultBody), nil
 }
 
 func sesPost(data url.Values, endpoint, accessKeyID, secretAccessKey string) (string, error) {
-	body := strings.NewReader(data.Encode())
-	req, err := http.NewRequest("POST", endpoint, body)
+	req, err := http.NewRequest("POST", endpoint, strings.NewReader(data.Encode()))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	now := time.Now().UTC()
-	// date format: "Tue, 25 May 2010 21:20:27 +0000"
-	date := now.Format("Mon, 02 Jan 2006 15:04:05 -0700")
+	date := time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 -0700")
 	req.Header.Set("Date", date)
 
 	h := hmac.New(sha256.New, []uint8(secretAccessKey))
@@ -180,17 +171,15 @@ func sesPost(data url.Values, endpoint, accessKeyID, secretAccessKey string) (st
 
 	var r *http.Response
 	if r, err = http.DefaultClient.Do(req); err != nil {
-		log.Printf("http error: %s", err)
 		return "", err
 	}
 
 	resultBody, _ := ioutil.ReadAll(r.Body)
-	_ = r.Body.Close()
+	defer func() {
+		_ = r.Body.Close()
+	}()
 
 	if r.StatusCode != http.StatusOK {
-		log.Printf("error, status = %d", r.StatusCode)
-
-		log.Printf("error response: %s", resultBody)
 		return "", fmt.Errorf("error code %d. response: %s", r.StatusCode, resultBody)
 	}
 
