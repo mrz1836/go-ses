@@ -1,8 +1,3 @@
-// Copyright 2013 SourceGraph, Inc.
-// Copyright 2011-2013 Numrotron Inc.
-// Use of this source code is governed by an MIT-style license
-// that can be found in the LICENSE file.
-
 package ses
 
 import (
@@ -27,7 +22,7 @@ func checkFlags(t *testing.T) {
 
 func TestSendEmail(t *testing.T) {
 	checkFlags(t)
-	_, err := EnvConfig.SendEmail(from, to, "amzses text test", textBody)
+	_, err := EnvConfig.SendEmail(from, []string{to}, []string{""}, []string{""}, "amazon SES text test", textBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +30,7 @@ func TestSendEmail(t *testing.T) {
 
 func TestSendEmailHTML(t *testing.T) {
 	checkFlags(t)
-	_, err := EnvConfig.SendEmailHTML(from, to, "amzses html test", textBody, htmlBody)
+	_, err := EnvConfig.SendEmail(from, []string{to}, []string{""}, []string{""}, "amazon SES text test", textBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +41,7 @@ func TestSendRawEmail(t *testing.T) {
 	attachment := base64.StdEncoding.EncodeToString([]byte(textBody))
 	raw := `To: %s
 From: %s
-Subject: amzses raw test
+Subject: amazon SES raw test
 Content-Type: multipart/mixed; boundary="_003_97DCB304C5294779BEBCFC8357FCC4D2"
 MIME-Version: 1.0
 
@@ -72,11 +67,4 @@ Content-Transfer-Encoding: base64
 	}
 }
 
-var textBody = `This is an example email body for the amzses go package.`
-
-var htmlBody = `
-This is an <b>html email</b>.
-<br/>
-<br/>
-<img src="http://placehold.it/600x200/">
-`
+var textBody = `This is an example email body for the amazon SES go package.`

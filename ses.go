@@ -1,8 +1,3 @@
-// Copyright 2013 SourceGraph, Inc.
-// Copyright 2011-2013 Numrotron Inc.
-// Use of this source code is governed by an MIT-style license
-// that can be found in the LICENSE file.
-
 package ses
 
 import (
@@ -49,17 +44,17 @@ func (c *Config) SendEmail(from string, to, cc, bcc []string, subject, body stri
 
 	if to != nil {
 		for i := 0; i < len(to); i++ {
-			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", (i+1)), to[i])
+			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", i+11), to[i])
 		}
 	}
 	if cc != nil {
 		for i := 0; i < len(cc); i++ {
-			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", (i+1)), cc[i])
+			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", i+1), cc[i])
 		}
 	}
 	if bcc != nil {
 		for i := 0; i < len(bcc); i++ {
-			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", (i+1)), bcc[i])
+			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", i+1), bcc[i])
 		}
 	}
 
@@ -79,17 +74,17 @@ func (c *Config) SendEmailHTML(from string, to, cc, bcc []string, subject, bodyT
 
 	if to != nil {
 		for i := 0; i < len(to); i++ {
-			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", (i+1)), to[i])
+			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", i+1), to[i])
 		}
 	}
 	if cc != nil {
 		for i := 0; i < len(cc); i++ {
-			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", (i+1)), cc[i])
+			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", i+1), cc[i])
 		}
 	}
 	if bcc != nil {
 		for i := 0; i < len(bcc); i++ {
-			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", (i+1)), bcc[i])
+			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", i+1), bcc[i])
 		}
 	}
 
@@ -121,8 +116,8 @@ func authorizationHeader(date, accessKeyID, secretAccessKey string) []string {
 }
 
 func sesGet(data url.Values, endpoint, accessKeyID, secretAccessKey string) (string, error) {
-	urlstr := fmt.Sprintf("%s?%s", endpoint, data.Encode())
-	endpointURL, _ := url.Parse(urlstr)
+	urlString := fmt.Sprintf("%s?%s", endpoint, data.Encode())
+	endpointURL, _ := url.Parse(urlString)
 	headers := map[string][]string{}
 
 	now := time.Now().UTC()
@@ -151,17 +146,17 @@ func sesGet(data url.Values, endpoint, accessKeyID, secretAccessKey string) (str
 		return "", err
 	}
 
-	resultbody, _ := ioutil.ReadAll(r.Body)
-	r.Body.Close()
+	resultBody, _ := ioutil.ReadAll(r.Body)
+	_ = r.Body.Close()
 
-	if r.StatusCode != 200 {
+	if r.StatusCode != http.StatusOK {
 		log.Printf("error, status = %d", r.StatusCode)
 
-		log.Printf("error response: %s", resultbody)
-		return "", errors.New(string(resultbody))
+		log.Printf("error response: %s", resultBody)
+		return "", errors.New(string(resultBody))
 	}
 
-	return string(resultbody), nil
+	return string(resultBody), nil
 }
 
 func sesPost(data url.Values, endpoint, accessKeyID, secretAccessKey string) (string, error) {
@@ -183,21 +178,21 @@ func sesPost(data url.Values, endpoint, accessKeyID, secretAccessKey string) (st
 	auth := fmt.Sprintf("AWS3-HTTPS AWSAccessKeyId=%s, Algorithm=HmacSHA256, Signature=%s", accessKeyID, signature)
 	req.Header.Set("X-Amzn-Authorization", auth)
 
-	r, err := http.DefaultClient.Do(req)
-	if err != nil {
+	var r *http.Response
+	if r, err = http.DefaultClient.Do(req); err != nil {
 		log.Printf("http error: %s", err)
 		return "", err
 	}
 
-	resultbody, _ := ioutil.ReadAll(r.Body)
-	r.Body.Close()
+	resultBody, _ := ioutil.ReadAll(r.Body)
+	_ = r.Body.Close()
 
-	if r.StatusCode != 200 {
+	if r.StatusCode != http.StatusOK {
 		log.Printf("error, status = %d", r.StatusCode)
 
-		log.Printf("error response: %s", resultbody)
-		return "", fmt.Errorf("error code %d. response: %s", r.StatusCode, resultbody)
+		log.Printf("error response: %s", resultBody)
+		return "", fmt.Errorf("error code %d. response: %s", r.StatusCode, resultBody)
 	}
 
-	return string(resultbody), nil
+	return string(resultBody), nil
 }
