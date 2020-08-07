@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
+	"time"
 )
 
 var to, from string
@@ -85,8 +87,9 @@ var htmlBody = `<p>This is an example email body for the amazon SES go package.<
 
 func TestSendEmailLocal(t *testing.T) {
 	var values url.Values
-
+	var auth string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth = r.Header.Get("Authorization")
 		body, _ := ioutil.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
@@ -97,6 +100,9 @@ func TestSendEmailLocal(t *testing.T) {
 	_, err := cfg.SendEmail("from", []string{"to"}, nil, nil, subject, textBody)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
+		t.Errorf("Wrong signature")
 	}
 	if values.Get("Action") != "SendEmail" {
 		t.Errorf("Missing Action")
@@ -114,8 +120,10 @@ func TestSendEmailLocal(t *testing.T) {
 
 func TestSendEmailHTMLLocal(t *testing.T) {
 	var values url.Values
+	var auth string
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth = r.Header.Get("Authorization")
 		body, _ := ioutil.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
@@ -126,6 +134,9 @@ func TestSendEmailHTMLLocal(t *testing.T) {
 	_, err := cfg.SendEmailHTML("from", []string{"to"}, nil, nil, subject, textBody, htmlBody)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
+		t.Errorf("Wrong signature")
 	}
 	if values.Get("Action") != "SendEmail" {
 		t.Errorf("Missing Action")
@@ -146,8 +157,10 @@ func TestSendEmailHTMLLocal(t *testing.T) {
 
 func TestSendEmailRawLocal(t *testing.T) {
 	var values url.Values
+	var auth string
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		auth = r.Header.Get("Authorization")
 		body, _ := ioutil.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
@@ -159,6 +172,9 @@ func TestSendEmailRawLocal(t *testing.T) {
 	_, err := cfg.SendRawEmail(body)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
+		t.Errorf("Wrong signature")
 	}
 	if values.Get("Action") != "SendRawEmail" {
 		t.Errorf("Missing Action")
