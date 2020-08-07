@@ -1,10 +1,10 @@
 package ses
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	awssigner "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -18,6 +18,9 @@ type Config struct {
 	// Endpoint is the AWS endpoint to use for requests.
 	Endpoint string
 
+	// The region
+	Region string
+
 	// AccessKeyID is your Amazon AWS access key ID.
 	AccessKeyID string
 
@@ -29,8 +32,29 @@ type Config struct {
 // $AWS_ACCESS_KEY_ID and $AWS_SECRET_KEY, respectively.
 var EnvConfig = Config{
 	Endpoint:        os.Getenv("AWS_SES_ENDPOINT"),
+	Region:          os.Getenv("AWS_REGION"),
 	AccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
 	SecretAccessKey: os.Getenv("AWS_SECRET_KEY"),
+}
+
+func (c *Config) fillRecipients(from string, to, cc, bcc []string, data url.Values) {
+	data.Add("Source", from)
+
+	if len(to) > 0 {
+		for i := 0; i < len(to); i++ {
+			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", i+1), to[i])
+		}
+	}
+	if len(cc) > 0 {
+		for i := 0; i < len(cc); i++ {
+			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", i+1), cc[i])
+		}
+	}
+	if len(bcc) > 0 {
+		for i := 0; i < len(bcc); i++ {
+			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", i+1), bcc[i])
+		}
+	}
 }
 
 // SendEmail sends a plain text email. Note that from must be a verified
@@ -38,29 +62,11 @@ var EnvConfig = Config{
 func (c *Config) SendEmail(from string, to, cc, bcc []string, subject, body string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
-	data.Add("Source", from)
-
-	if to != nil {
-		for i := 0; i < len(to); i++ {
-			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", i+11), to[i])
-		}
-	}
-	if cc != nil {
-		for i := 0; i < len(cc); i++ {
-			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", i+1), cc[i])
-		}
-	}
-	if bcc != nil {
-		for i := 0; i < len(bcc); i++ {
-			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", i+1), bcc[i])
-		}
-	}
-
+	c.fillRecipients(from, to, cc, bcc, data)
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", body)
 	data.Add("AWSAccessKeyId", c.AccessKeyID)
-
-	return sesPost(data, c.Endpoint, c.AccessKeyID, c.SecretAccessKey)
+	return c.sesPost(data)
 }
 
 // SendEmailHTML sends a HTML email. Note that from must be a verified address
@@ -68,30 +74,12 @@ func (c *Config) SendEmail(from string, to, cc, bcc []string, subject, body stri
 func (c *Config) SendEmailHTML(from string, to, cc, bcc []string, subject, bodyText, bodyHTML string) (string, error) {
 	data := make(url.Values)
 	data.Add("Action", "SendEmail")
-	data.Add("Source", from)
-
-	if to != nil {
-		for i := 0; i < len(to); i++ {
-			data.Add(fmt.Sprintf("Destination.ToAddresses.member.%d", i+1), to[i])
-		}
-	}
-	if cc != nil {
-		for i := 0; i < len(cc); i++ {
-			data.Add(fmt.Sprintf("Destination.CcAddresses.member.%d", i+1), cc[i])
-		}
-	}
-	if bcc != nil {
-		for i := 0; i < len(bcc); i++ {
-			data.Add(fmt.Sprintf("Destination.BccAddresses.member.%d", i+1), bcc[i])
-		}
-	}
-
+	c.fillRecipients(from, to, cc, bcc, data)
 	data.Add("Message.Subject.Data", subject)
 	data.Add("Message.Body.Text.Data", bodyText)
 	data.Add("Message.Body.Html.Data", bodyHTML)
 	data.Add("AWSAccessKeyId", c.AccessKeyID)
-
-	return sesPost(data, c.Endpoint, c.AccessKeyID, c.SecretAccessKey)
+	return c.sesPost(data)
 }
 
 // SendRawEmail sends a raw email. Note that from must be a verified address
@@ -101,73 +89,26 @@ func (c *Config) SendRawEmail(raw []byte) (string, error) {
 	data.Add("Action", "SendRawEmail")
 	data.Add("RawMessage.Data", base64.StdEncoding.EncodeToString(raw))
 	data.Add("AWSAccessKeyId", c.AccessKeyID)
-
-	return sesPost(data, c.Endpoint, c.AccessKeyID, c.SecretAccessKey)
+	return c.sesPost(data)
 }
 
-func authorizationHeader(date, accessKeyID, secretAccessKey string) []string {
-	h := hmac.New(sha256.New, []uint8(secretAccessKey))
-	h.Write([]uint8(date))
-	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	auth := fmt.Sprintf("AWS3-HTTPS AWSAccessKeyId=%s, Algorithm=HmacSHA256, Signature=%s", accessKeyID, signature)
-	return []string{auth}
+func (c *Config) sigv4(req *http.Request, body string, tm time.Time) {
+	creds := credentials.NewCredentials(&credentials.StaticProvider{Value: credentials.Value{AccessKeyID: c.AccessKeyID, SecretAccessKey: c.SecretAccessKey}})
+	signer := awssigner.NewSigner(creds)
+	signer.Sign(req, strings.NewReader(body), "email", c.Region, tm)
 }
 
-func sesGet(data url.Values, endpoint, accessKeyID, secretAccessKey string) (string, error) {
-	urlString := fmt.Sprintf("%s?%s", endpoint, data.Encode())
-	endpointURL, _ := url.Parse(urlString)
-	headers := map[string][]string{}
-
-	date := time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 -0700")
-	headers["Date"] = []string{date}
-
-	h := hmac.New(sha256.New, []uint8(secretAccessKey))
-	h.Write([]uint8(date))
-	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	auth := fmt.Sprintf("AWS3-HTTPS AWSAccessKeyId=%s, Algorithm=HmacSHA256, Signature=%s", accessKeyID, signature)
-	headers["X-Amzn-Authorization"] = []string{auth}
-
-	req := http.Request{
-		Close:      true,
-		Header:     headers,
-		Method:     "GET",
-		ProtoMajor: 1,
-		ProtoMinor: 1,
-		URL:        endpointURL,
-	}
-
-	r, err := http.DefaultClient.Do(&req)
-	if err != nil {
-		return "", err
-	}
-
-	resultBody, _ := ioutil.ReadAll(r.Body)
-	defer func() {
-		_ = r.Body.Close()
-	}()
-
-	if r.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("error code %d. response: %s", r.StatusCode, resultBody)
-	}
-
-	return string(resultBody), nil
-}
-
-func sesPost(data url.Values, endpoint, accessKeyID, secretAccessKey string) (string, error) {
-	req, err := http.NewRequest("POST", endpoint, strings.NewReader(data.Encode()))
+func (c *Config) sesPost(data url.Values) (string, error) {
+	req, err := http.NewRequest("POST", c.Endpoint, nil)
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	date := time.Now().UTC().Format("Mon, 02 Jan 2006 15:04:05 -0700")
+	now := time.Now().UTC()
+	date := now.Format("Mon, 02 Jan 2006 15:04:05 -0700")
 	req.Header.Set("Date", date)
-
-	h := hmac.New(sha256.New, []uint8(secretAccessKey))
-	h.Write([]uint8(date))
-	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	auth := fmt.Sprintf("AWS3-HTTPS AWSAccessKeyId=%s, Algorithm=HmacSHA256, Signature=%s", accessKeyID, signature)
-	req.Header.Set("X-Amzn-Authorization", auth)
+	c.sigv4(req, data.Encode(), now)
 
 	var r *http.Response
 	if r, err = http.DefaultClient.Do(req); err != nil {

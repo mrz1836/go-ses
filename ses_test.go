@@ -22,7 +22,7 @@ func checkFlags(t *testing.T) {
 
 func TestSendEmail(t *testing.T) {
 	checkFlags(t)
-	_, err := EnvConfig.SendEmail(from, []string{to}, []string{""}, []string{""}, "amazon SES text test", textBody)
+	_, err := EnvConfig.SendEmail(from, []string{to}, nil, nil, "amazon SES text test", textBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func TestSendEmail(t *testing.T) {
 
 func TestSendEmailHTML(t *testing.T) {
 	checkFlags(t)
-	_, err := EnvConfig.SendEmail(from, []string{to}, []string{""}, []string{""}, "amazon SES text test", textBody)
+	_, err := EnvConfig.SendEmail(from, []string{to}, nil, nil, "amazon SES text test", textBody)
 	if err != nil {
 		t.Fatal(err)
 	}
