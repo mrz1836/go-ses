@@ -114,9 +114,8 @@ make run-examples
 ``` 
 
 #### Running Integration Tests
-1. Set the environment variables `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_KEY` and `$AWS_SES_ENDPOINT`.
-2. Example SES Endpoint `https://email.us-west-2.amazonaws.com`
-3. Run `go test -from=user@example.com`, where `user@example.com` is a sender address that is verified
+1. Set the environment variables `$AWS_ACCESS_KEY_ID`, `$AWS_SECRET_KEY`, `$AWS_REGION` and `$AWS_SES_ENDPOINT`.
+2. Run `go test -from=user@example.com`, where `user@example.com` is a sender address that is verified
    in your Amazon SES account.
 
 <br/>
