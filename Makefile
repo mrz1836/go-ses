@@ -17,6 +17,9 @@ endif
 .PHONY: clean
 
 all: ## Runs multiple commands
+	@$(MAKE) test-short
+
+alltest: ## Runs multiple commands
 	@$(MAKE) test
 
 clean: ## Remove previous builds and any test cache data
