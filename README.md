@@ -1,15 +1,13 @@
 # go-ses
 > Lightweight implementation of [AWS SES](https://aws.amazon.com/ses/) - fork from [go-ses](https://github.com/publica-project/go-ses)
 
-[![Release](https://img.shields.io/github/release-pre/mrz1836/go-ses.svg?logo=github&style=flat&v=1)](https://github.com/mrz1836/go-ses/releases)
-[![Build Status](https://travis-ci.com/mrz1836/go-ses.svg?branch=master)](https://travis-ci.com/mrz1836/go-ses)
-[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-ses?style=flat&v=1)](https://goreportcard.com/report/github.com/mrz1836/go-ses)
+[![Release](https://img.shields.io/github/release-pre/mrz1836/go-ses.svg?logo=github&style=flat&v=2)](https://github.com/mrz1836/go-ses/releases)
+[![Build Status](https://travis-ci.com/mrz1836/go-ses.svg?branch=master&v=2)](https://travis-ci.com/mrz1836/go-ses)
+[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-ses?style=flat&v=2)](https://goreportcard.com/report/github.com/mrz1836/go-ses)
 [![codecov](https://codecov.io/gh/mrz1836/go-ses/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-ses)
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-ses)](https://golang.org/)
 [![Sponsor](https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/mrz1836)
 [![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat)](https://mrz1818.com/?tab=tips&af=go-ses)
-
-<br/>
 
 <br/>
 
@@ -43,7 +41,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-ses)
 ### Features
 - Send raw or html emails
 - Multiple to, cc, and bcc recipients
-- AWS4 signatures
+- AWS4 signature compliance
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
@@ -68,6 +66,7 @@ make help
 List of all current commands:
 ```text
 all                    Runs multiple commands
+all-tests              Runs multiple commands
 clean                  Remove previous builds and any test cache data
 clean-mods             Remove all the Go mod cache
 coverage               Shows the test coverage
@@ -99,12 +98,6 @@ vet                    Run the Go vet application
 ## Examples & Tests
 All unit tests and [examples](examples/simple/simple.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-ses) and uses [Go version 1.14.x](https://golang.org/doc/go1.14). View the [deployment configuration file](.travis.yml).
 
-#### Running Tests
-1. Set the environment variables `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_KEY` and `$AWS_SES_ENDPOINT`.
-2. Example SES Endpoint `https://email.us-west-2.amazonaws.com`
-3. Run `go test -from=user@example.com`, where `user@example.com` is a sender address that is verified
-   in your Amazon SES account.
-
 Run all tests (including integration tests)
 ```shell script
 make test
@@ -118,7 +111,13 @@ make test-short
 Run the examples:
 ```shell script
 make run-examples
-```
+``` 
+
+#### Running Integration Tests
+1. Set the environment variables `$AWS_ACCESS_KEY_ID` and `$AWS_SECRET_KEY` and `$AWS_SES_ENDPOINT`.
+2. Example SES Endpoint `https://email.us-west-2.amazonaws.com`
+3. Run `go test -from=user@example.com`, where `user@example.com` is a sender address that is verified
+   in your Amazon SES account.
 
 <br/>
 
@@ -167,14 +166,6 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&af=go-ses) t
 
 ## License
 
-![License](https://img.shields.io/github/license/mrz1836/go-ses.svg?style=flat&v=1)
+![License](https://img.shields.io/github/license/mrz1836/go-ses.svg?style=flat&v=2)
 
 Note: the public API is experimental and subject to change until further notice.
-
-
-Usage
-=====
-
-Documentation: [go-ses on Sourcegraph](https://sourcegraph.com/github.com/sourcegraph/go-ses).
-
-Example: [example_test.go](https://github.com/sourcegraph/go-ses/blob/master/example_test.go) ([Sourcegraph](https://sourcegraph.com/github.com/sourcegraph/go-ses/tree/master/example_test.go)):

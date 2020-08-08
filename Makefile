@@ -19,7 +19,7 @@ endif
 all: ## Runs multiple commands
 	@$(MAKE) test-short
 
-alltest: ## Runs multiple commands
+all-tests: ## Runs multiple commands
 	@$(MAKE) test
 
 clean: ## Remove previous builds and any test cache data
