@@ -101,8 +101,9 @@ func TestSendEmailLocal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
-		t.Errorf("Wrong signature")
+	expected := fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().UTC().Format("20060102"))
+	if !strings.HasPrefix(auth, expected) {
+		t.Errorf("Wrong signature: expected: %s got %s", expected, auth)
 	}
 	if values.Get("Action") != "SendEmail" {
 		t.Errorf("Missing Action")
@@ -135,8 +136,9 @@ func TestSendEmailHTMLLocal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
-		t.Errorf("Wrong signature")
+	expected := fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().UTC().Format("20060102"))
+	if !strings.HasPrefix(auth, expected) {
+		t.Errorf("Wrong signature: expected: %s got %s", expected, auth)
 	}
 	if values.Get("Action") != "SendEmail" {
 		t.Errorf("Missing Action")
@@ -173,8 +175,9 @@ func TestSendEmailRawLocal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasPrefix(auth, fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().Format("20060102"))) {
-		t.Errorf("Wrong signature")
+	expected := fmt.Sprintf("AWS4-HMAC-SHA256 Credential=a/%s/region/email/aws4_request, SignedHeaders=content-type;date;host;x-amz-date, Signature=", time.Now().UTC().Format("20060102"))
+	if !strings.HasPrefix(auth, expected) {
+		t.Errorf("Wrong signature: expected: %s got %s", expected, auth)
 	}
 	if values.Get("Action") != "SendRawEmail" {
 		t.Errorf("Missing Action")
