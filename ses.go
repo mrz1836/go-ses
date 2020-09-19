@@ -3,14 +3,15 @@ package ses
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	awssigner "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	awssigner "github.com/aws/aws-sdk-go/aws/signer/v4"
 )
 
 // Config specifies configuration options and credentials for accessing Amazon SES.
@@ -93,9 +94,9 @@ func (c *Config) SendRawEmail(raw []byte) (string, error) {
 }
 
 func (c *Config) sigv4(req *http.Request, body string, tm time.Time) {
-	creds := credentials.NewCredentials(&credentials.StaticProvider{Value: credentials.Value{AccessKeyID: c.AccessKeyID, SecretAccessKey: c.SecretAccessKey}})
-	signer := awssigner.NewSigner(creds)
-	signer.Sign(req, strings.NewReader(body), "email", c.Region, tm)
+	awsCredentials := credentials.NewCredentials(&credentials.StaticProvider{Value: credentials.Value{AccessKeyID: c.AccessKeyID, SecretAccessKey: c.SecretAccessKey}})
+	signer := awssigner.NewSigner(awsCredentials)
+	_, _ = signer.Sign(req, strings.NewReader(body), "email", c.Region, tm)
 }
 
 func (c *Config) sesPost(data url.Values) (string, error) {
