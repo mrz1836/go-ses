@@ -39,9 +39,9 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-ses)
 [![GoDoc](https://godoc.org/github.com/mrz1836/go-ses?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-ses)
 
 ### Features
-- Send raw or html emails
-- Multiple to, cc, and bcc recipients
-- AWS4 signature compliance
+- Send `raw` or `html` emails
+- Multiple `to`, `cc`, and `bcc` recipients
+- **AWS4** signature compliance
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
@@ -166,5 +166,3 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&af=go-ses) t
 ## License
 
 ![License](https://img.shields.io/github/license/mrz1836/go-ses.svg?style=flat&v=2)
-
-Note: the public API is experimental and subject to change until further notice.
