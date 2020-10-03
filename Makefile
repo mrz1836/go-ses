@@ -19,9 +19,6 @@ endif
 all: ## Runs multiple commands
 	@$(MAKE) test-short
 
-all-tests: ## Runs multiple commands
-	@$(MAKE) test
-
 clean: ## Remove previous builds and any test cache data
 	@go clean -cache -testcache -i -r
 	@test $(DISTRIBUTIONS_DIR)
