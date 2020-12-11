@@ -2,4 +2,4 @@ module github.com/mrz1836/go-ses
 
 go 1.15
 
-require github.com/aws/aws-sdk-go v1.36.2
+require github.com/aws/aws-sdk-go v1.36.7
