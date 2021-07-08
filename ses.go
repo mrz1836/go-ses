@@ -82,7 +82,7 @@ func (c *Config) SendEmail(from string, to, cc, bcc []string, subject, body stri
 	return c.sesPost(data)
 }
 
-// SendEmailHTML sends a HTML email. Note that from must be a verified address
+// SendEmailHTML sends an HTML email. Note that from must be a verified address
 // in the AWS control panel.
 func (c *Config) SendEmailHTML(from string, to, cc, bcc []string, subject, bodyText, bodyHTML string) (string, error) {
 	data := make(url.Values)
