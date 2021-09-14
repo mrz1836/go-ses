@@ -6,6 +6,8 @@
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-ses?style=flat&v=2)](https://goreportcard.com/report/github.com/mrz1836/go-ses)
 [![codecov](https://codecov.io/gh/mrz1836/go-ses/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-ses)
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-ses)](https://golang.org/)
+<br>
+[![Mergify Status](https://img.shields.io/endpoint.svg?url=https://gh.mergify.io/badges/mrz1836/go-ses&style=flat&v=1)](https://mergify.io)
 [![Sponsor](https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/mrz1836)
 [![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat)](https://mrz1818.com/?tab=tips&af=go-ses)
 
@@ -69,6 +71,8 @@ all                  Runs multiple commands
 clean                Remove previous builds and any test cache data
 clean-mods           Remove all the Go mod cache
 coverage             Shows the test coverage
+diff                 Show the git diff
+generate             Runs the go generate command in the base of the repo
 godocs               Sync the latest tag with GoDocs
 help                 Show this help message
 install              Install the application
@@ -83,11 +87,13 @@ run-examples         Runs all the examples
 tag                  Generate a new tag and push (tag version=0.0.0)
 tag-remove           Remove a tag if found (tag-remove version=0.0.0)
 tag-update           Update an existing tag to current commit (tag-update version=0.0.0)
-test                 Runs vet, lint and ALL tests
+test                 Runs lint and ALL tests
 test-ci              Runs all tests via CI (exports coverage)
 test-ci-no-race      Runs all tests via CI (no race) (exports coverage)
 test-ci-short        Runs unit tests via CI (exports coverage)
+test-no-lint         Runs just tests
 test-short           Runs vet, lint and tests (excludes integration tests)
+test-unit            Runs tests and outputs coverage
 uninstall            Uninstall the application (and remove files)
 update-linter        Update the golangci-lint package (macOS only)
 vet                  Run the Go vet application
@@ -168,4 +174,4 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&af=go-ses) t
 
 ## License
 
-![License](https://img.shields.io/github/license/mrz1836/go-ses.svg?style=flat&v=2)
+[![License](https://img.shields.io/github/license/mrz1836/go-ses.svg?style=flat&v=2)](LICENSE)
