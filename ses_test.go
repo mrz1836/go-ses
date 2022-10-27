@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -54,7 +54,7 @@ func (m *mockHTTPBadRequest) Do(req *http.Request) (*http.Response, error) {
 		return resp, fmt.Errorf("missing request")
 	}
 
-	resp.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(`{"error":"message failed"}`)))
+	resp.Body = io.NopCloser(bytes.NewBuffer([]byte(`{"error":"message failed"}`)))
 
 	// Default is valid
 	return resp, nil
@@ -80,7 +80,7 @@ func TestConfig_SendEmail(t *testing.T) {
 	var auth string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
 	defer server.Close()
@@ -116,7 +116,7 @@ func TestConfig_SendEmailHTML(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
 	defer server.Close()
@@ -155,7 +155,7 @@ func TestConfig_SendRawEmail(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
-		body, _ := ioutil.ReadAll(r.Body)
+		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
 	}))
 	defer server.Close()

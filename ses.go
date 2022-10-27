@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -141,7 +141,7 @@ func (c *Config) sesPost(data url.Values) (string, error) {
 
 	// Read the body
 	var resultBody []byte
-	if resultBody, err = ioutil.ReadAll(resp.Body); err != nil {
+	if resultBody, err = io.ReadAll(resp.Body); err != nil {
 		return "", err
 	}
 
