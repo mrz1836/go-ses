@@ -2,7 +2,7 @@
 > Lightweight implementation of [AWS SES](https://aws.amazon.com/ses/) - fork from [go-ses](https://github.com/publica-project/go-ses)
 
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-ses.svg?logo=github&style=flat&v=2)](https://github.com/mrz1836/go-ses/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/mrz1836/go-ses/run-go-tests?logo=github&v=3)](https://github.com/mrz1836/go-ses/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/mrz1836/go-ses/run-tests.yml?branch=master&logo=github&v=2)](https://github.com/mrz1836/go-ses/actions)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-ses?style=flat&v=2)](https://goreportcard.com/report/github.com/mrz1836/go-ses)
 [![codecov](https://codecov.io/gh/mrz1836/go-ses/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-ses)
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-ses)](https://golang.org/)
