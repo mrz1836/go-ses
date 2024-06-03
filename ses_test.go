@@ -54,13 +54,13 @@ func (m *mockHTTPBadRequest) Do(req *http.Request) (*http.Response, error) {
 		return resp, fmt.Errorf("missing request")
 	}
 
-	resp.Body = io.NopCloser(bytes.NewBuffer([]byte(`{"error":"message failed"}`)))
+	resp.Body = io.NopCloser(bytes.NewBufferString(`{"error":"message failed"}`))
 
 	// Default is valid
 	return resp, nil
 }
 
-func init() {
+func init() { //nolint:gochecknoinits // ignore
 	flag.StringVar(&to, "to", "success@simulator.amazonses.com", "email recipient")
 	flag.StringVar(&cc, "cc", "success@simulator.amazonses.com", "cc email recipient")
 	flag.StringVar(&bcc, "bcc", "success@simulator.amazonses.com", "bcc email recipient")
@@ -78,7 +78,7 @@ func checkFlags(t *testing.T) {
 func TestConfig_SendEmail(t *testing.T) {
 	var values url.Values
 	var auth string
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
 		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
@@ -114,7 +114,7 @@ func TestConfig_SendEmailHTML(t *testing.T) {
 	var values url.Values
 	var auth string
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
 		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
@@ -153,7 +153,7 @@ func TestConfig_SendRawEmail(t *testing.T) {
 	var values url.Values
 	var auth string
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		auth = r.Header.Get("Authorization")
 		body, _ := io.ReadAll(r.Body)
 		values, _ = url.ParseQuery(string(body))
@@ -185,7 +185,7 @@ func TestConfig_SendRawEmail(t *testing.T) {
 // TestConfig_SendEmailError will test the method SendEmail()
 func TestConfig_SendEmailError(t *testing.T) {
 
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	server := httptest.NewServer(http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {}))
 	defer server.Close()
 
 	attachment := base64.StdEncoding.EncodeToString([]byte(textBody))
