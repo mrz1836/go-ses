@@ -2,11 +2,13 @@
 # ---------------------------
 # General
 # ---------------------------
+version: 2
+
 before:
   hooks:
     - make all
 snapshot:
-  name_template: "{{ .Tag }}"
+  version_template: "{{ .Tag }}"
 changelog:
   sort: asc
   filters:
@@ -16,23 +18,21 @@ changelog:
       - '^test:'
 
 # ---------------------------
-# Publishers
-# ---------------------------
-# publishers:
-#  - name: "Publish GoDocs"
-#    cmd: make godocs
-
-# ---------------------------
 # Builder
 # ---------------------------
-build:
-  skip: true
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    skip: true
 
 # ---------------------------
-# Github Release
+# GitHub Release
 # ---------------------------
 release:
-  prerelease: true
+  prerelease: false
   name_template: "Release v{{.Version}}"
 
 # ---------------------------
